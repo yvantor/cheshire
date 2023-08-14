@@ -20,7 +20,7 @@ module cheshire_top_xilinx
   input logic         cpu_resetn,
 `endif
 
-  // System clock for clk_wiz
+  // System clock for clk_wiz and ddr
   input logic         sys_clk_p,
   input logic         sys_clk_n,
 
@@ -91,10 +91,38 @@ module cheshire_top_xilinx
   `DDR3_INTF
 `endif
 
+`ifdef USE_PCIE
+  input logic         pcie_sys_clk_p,
+  input logic         pcie_sys_clk_n,
+  output wire [3 : 0] pcie_txp,
+  output wire [3 : 0] pcie_txn,
+  input  wire [3 : 0] pcie_rxp,
+  input  wire [3 : 0] pcie_rxn,
+`endif
+
   output logic        uart_tx_o,
   input logic         uart_rx_i
 
 );
+
+typedef enum byte_bt {
+  PcieUpstreamIdx      = 'd0
+} axi_slv_idx_t;
+
+typedef enum byte_bt {
+  PcieDownstreamIdx    = 'd0
+} axi_mst_idx_t;
+
+typedef enum doub_bt {
+  PcieUpstreamBase      = 'h0000_0001_0000_0000
+} axi_start_t;
+
+// AXI Slave Sizes
+localparam doub_bt PcieUpstreamSize      = 'h0000_0000_8000_0000;
+
+typedef enum doub_bt {
+  PcieUpstreamEnd      = PcieUpstreamBase + PcieUpstreamSize
+} axi_end_t;
 
   // Configure cheshire for FPGA mapping
   localparam cheshire_cfg_t FPGACfg = '{
@@ -123,6 +151,14 @@ module cheshire_top_xilinx
     RegMaxWriteTxns   : 8,
     RegAmoNumCuts     : 1,
     RegAmoPostCut     : 1,
+    // External AXI ports (at most 8 ports and rules)
+    AxiExtNumMst      : 1,
+    AxiExtNumSlv      : 1,
+    AxiExtNumRules    : 1,
+    // External AXI region map
+    AxiExtRegionIdx   : '{0, 0, 0, 0, 0, 0, 0, 0, PcieUpstreamIdx, 0, 0, 0, 0, 0, 0, 0 },
+    AxiExtRegionStart : '{0, 0, 0, 0, 0, 0, 0, 0, PcieUpstreamBase, 0, 0, 0, 0, 0, 0, 0 },
+    AxiExtRegionEnd   : '{0, 0, 0, 0, 0, 0, 0, 0, PcieUpstreamEnd , 0, 0, 0, 0, 0, 0, 0 },
     // RTC
     RtcFreq           : 1000000,
     // Features
@@ -184,6 +220,11 @@ module cheshire_top_xilinx
 
   axi_llc_req_t axi_llc_mst_req;
   axi_llc_rsp_t axi_llc_mst_rsp;
+
+  axi_mst_req_t [iomsb(FPGACfg.AxiExtNumMst):0] axi_ext_mst_req;
+  axi_mst_rsp_t [iomsb(FPGACfg.AxiExtNumMst):0] axi_ext_mst_rsp;
+  axi_slv_req_t [iomsb(FPGACfg.AxiExtNumSlv):0] axi_ext_slv_req;
+  axi_slv_rsp_t [iomsb(FPGACfg.AxiExtNumSlv):0] axi_ext_slv_rsp;
 
   ///////////////////////////
   // Clk reset definitions //
@@ -498,6 +539,52 @@ module cheshire_top_xilinx
     .rsp_o ( ext_rsp  )
   );
 
+
+`ifdef USE_PCIE
+
+  wire pcie_clk, pcie_clk_gt;
+
+  IBUFDS_GTE4 #(
+    .REFCLK_HROW_CK_SEL(2'b00)
+  ) u_ibufg_pcie_clk
+  (
+    .I  (pcie_sys_clk_p),
+    .IB (pcie_sys_clk_n),
+    .O  (pcie_clk_gt),
+    .ODIV2 (pcie_clk)
+  );
+
+  //////////
+  // XDMA //
+  //////////
+
+  pcie_wrapper #(
+    .axi_soc_aw_chan_t ( axi_llc_aw_chan_t ),
+    .axi_soc_w_chan_t  ( axi_llc_w_chan_t  ),
+    .axi_soc_b_chan_t  ( axi_llc_b_chan_t  ),
+    .axi_soc_ar_chan_t ( axi_llc_ar_chan_t ),
+    .axi_soc_r_chan_t  ( axi_llc_r_chan_t  ),
+    .axi_soc_req_t     ( axi_llc_req_t     ),
+    .axi_soc_resp_t    ( axi_llc_rsp_t     )
+  ) i_pcie_wrapper (
+    // Rst
+    .sys_rst_i                  ( sys_rst   ),
+    .soc_resetn_i               ( rst_n     ),
+    .soc_clk_i                  ( soc_clk   ),
+    // Sys clk
+    .pcie_clk_i                 ( pcie_clk    ),
+    .pcie_clk_gt_i              ( pcie_clk_gt ),
+    // Axi
+    .soc_pcie_req_i             ( axi_ext_slv_req[PcieUpstreamIdx]  ),
+    .soc_pcie_rsp_o             ( axi_ext_slv_rsp[PcieUpstreamIdx]  ),
+    .pcie_soc_req_o             ( axi_ext_mst_req[PcieDownstreamIdx]  ),
+    .pcie_soc_rsp_i             ( axi_ext_mst_rsp[PcieDownstreamIdx]  ),
+    // Phy
+    .*
+  );
+
+`endif // USE_PCIE
+
   //////////////////
   // Cheshire SoC //
   //////////////////
@@ -521,10 +608,10 @@ module cheshire_top_xilinx
     .rtc_i              ( rtc_clk_q       ),
     .axi_llc_mst_req_o  ( axi_llc_mst_req ),
     .axi_llc_mst_rsp_i  ( axi_llc_mst_rsp ),
-    .axi_ext_mst_req_i  ( '0 ),
-    .axi_ext_mst_rsp_o  ( ),
-    .axi_ext_slv_req_o  ( ),
-    .axi_ext_slv_rsp_i  ( '0 ),
+    .axi_ext_mst_req_i  ( axi_ext_mst_req ),
+    .axi_ext_mst_rsp_o  ( axi_ext_mst_rsp ),
+    .axi_ext_slv_req_o  ( axi_ext_slv_req ),
+    .axi_ext_slv_rsp_i  ( axi_ext_slv_rsp ),
     .reg_ext_slv_req_o  ( ),
     .reg_ext_slv_rsp_i  ( '0 ),
     .intr_ext_i         ( '0 ),

@@ -9,6 +9,7 @@
   `define USE_JTAG
   `define USE_JTAG_VDDGND
   `define USE_DDR4
+  `define USE_PCIE
   `define USE_QSPI
   `define USE_STARTUPE3
   `define USE_VIO
