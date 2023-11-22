@@ -171,17 +171,6 @@ packages:
     - axi
     - common_cells
     - register_interface
-  tagger:
-    revision: 2149244de2a9914cff33722d0d527ca3c1b3c877
-    version: null
-    source:
-      Git: git@iis-git.ee.ethz.ch:dishen/tagger.git
-    dependencies:
-    - axi
-    - common_cells
-    - common_verification
-    - register_interface
-    - tech_cells_generic
   tech_cells_generic:
     revision: 7968dd6e6180df2c644636bc6d2908a49f2190cf
     version: 0.2.13

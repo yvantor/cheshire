@@ -20,7 +20,7 @@ CHS_ROOT      ?= $(shell $(BENDER) path cheshire)
 CHS_REG_DIR   := $(shell $(BENDER) path register_interface)
 CHS_SLINK_DIR := $(shell $(BENDER) path serial_link)
 CHS_LLC_DIR   := $(shell $(BENDER) path axi_llc)
-CHS_TAGGER_DIR := $(shell $(BENDER) path tagger)
+CHS_TAGGER_DIR :=
 
 # Define paths used in dependencies
 OTPROOT      := $(shell $(BENDER) path opentitan_peripherals)
@@ -125,7 +125,7 @@ CHS_HW_ALL += $(AXIRTROOT)/.generated
 CHS_HW_ALL += $(AXI_VGA_ROOT)/.generated
 CHS_HW_ALL += $(CHS_SLINK_DIR)/.generated
 CHS_HW_ALL += $(CHS_LLC_DIR)/.generated
-CHS_HW_ALL += $(CHS_TAGGER_DIR)/.generated
+#CHS_HW_ALL += $(CHS_TAGGER_DIR)/.generated
 
 #####################
 # Generate Boot ROM #
