@@ -502,6 +502,7 @@ module cheshire_soc import cheshire_pkg::*; #(
     end
 
     axi_llc_reg_wrap #(
+      .EnableEcc        ( 1'b0             ),
       .SetAssociativity ( Cfg.LlcSetAssoc  ),
       .NumLines         ( Cfg.LlcNumLines  ),
       .NumBlocks        ( Cfg.LlcNumBlocks ),
