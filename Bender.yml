@@ -14,7 +14,7 @@ package:
 dependencies:
   apb_uart:                 { git: "https://github.com/pulp-platform/apb_uart.git",               version: 0.2.1  }
   axi:                      { git: "https://github.com/pulp-platform/axi.git",                    version: 0.39.2 }
-  axi_llc:                  { git: "https://github.com/pulp-platform/axi_llc",                    rev: 62079f9    } # branch: zx/ecc
+  axi_llc:                  { git: "https://github.com/pulp-platform/axi_llc",                    rev: 2f23e6fc4  } # branch: rt/fix-no-ecc-config
   axi_riscv_atomics:        { git: "https://github.com/pulp-platform/axi_riscv_atomics.git",      rev: 034bf8941  } # branch: master
   axi_rt:                   { git: "https://github.com/pulp-platform/axi_rt.git",                 version: 0.0.0-alpha.7 }
   axi_vga:                  { git: "https://github.com/pulp-platform/axi_vga.git",                version: 0.1.3  }
@@ -32,7 +32,7 @@ dependencies:
   serial_link:              { git: "https://github.com/pulp-platform/serial_link.git",            version: 1.1.1  }
   tagger:                   { git: "https://github.com/pulp-platform/transaction-tagger.git",     rev: b288376    }
   unbent:                   { git: "https://github.com/pulp-platform/unbent.git",                 version: 0.1.6  }
-  riscv-iommu:              { git: "https://github.com/zero-day-labs/riscv-iommu.git",            rev: 26ae5a844  } # branch: pulp
+  riscv-iommu:              { git: "https://github.com/zero-day-labs/riscv-iommu.git",            rev: c1dea3732  } # branch: pulp
 
 export_include_dirs:
   - hw/include

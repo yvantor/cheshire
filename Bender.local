@@ -1,0 +1,10 @@
+# Copyright 2023 ETH Zurich and University of Bologna.
+# Solderpad Hardware License, Version 0.51, see LICENSE for details.
+# SPDX-License-Identifier: SHL-0.51
+
+overrides:
+  axi_riscv_atomics:    { git: https://github.com/pulp-platform/axi_riscv_atomics.git     , rev: 46d567cad5a614a82778702d48b3a789aed7711b } # branch: astral
+  redundancy_cells:     { git: "https://github.com/pulp-platform/redundancy_cells.git"    , rev: "9e31f7c6c24877eaf58279903e7a162b16c9a721" } # branch: astral-v0
+  register_interface:   { git: "https://github.com/pulp-platform/register_interface.git"  , version: 0.4.4                                  }
+  common_cells:         { git: "https://github.com/pulp-platform/common_cells.git"        , version: 1.37.0                                 } # branch: master
+  riscv-iommu:          { git: "https://github.com/zero-day-labs/riscv-iommu.git"         , rev: c1dea3732d0d05e5659b31773e43f3364bc866fc   } # branch: pulp
