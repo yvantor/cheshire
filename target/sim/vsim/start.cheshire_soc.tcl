@@ -9,6 +9,11 @@
 
 set TESTBENCH tb_cheshire_soc
 
+# Example parameters for running tests
+set BINARY ../../../sw/tests/helloworld.spm.elf
+set BOOTMODE 0
+set PRELMODE 1
+
 # Set full path to c++ compiler.
 if { ![info exists CXX_PATH] } {
     if { ![info exists CXX] } {
