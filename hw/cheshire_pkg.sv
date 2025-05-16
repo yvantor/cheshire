@@ -485,69 +485,77 @@ package cheshire_pkg;
     doub_bt SizeLlcOut = cfg.LlcOutRegionEnd - cfg.LlcOutRegionStart;
     doub_bt CieBase   = cfg.Cva6ExtCieOnTop ? 64'h8000_0000 - cfg.Cva6ExtCieLength : 64'h2000_0000;
     doub_bt NoCieBase = cfg.Cva6ExtCieOnTop ? 64'h2000_0000 : 64'h2000_0000 + cfg.Cva6ExtCieLength;
-    return config_pkg::cva6_cfg_t'{
-      NrCommitPorts         : 2,
-      AxiAddrWidth          : cfg.AddrWidth,
-      AxiDataWidth          : cfg.AxiDataWidth,
-      AxiIdWidth            : Cva6IdWidth,
-      AxiUserWidth          : cfg.AxiUserWidth,
-      NrLoadBufEntries      : 2,
-      FpuEn                 : 1,
-      XF16                  : 0,
-      XF16ALT               : 0,
-      XF8                   : 0,
-      XF8ALT                : 0,
-      RVA                   : 1,
-      RVB                   : 0,
-      RVV                   : 0,
-      RVC                   : 1,
-      RVH                   : 1,
-      RVZCB                 : 1,
-      XFVec                 : 0,
-      CvxifEn               : 0,
-      ZiCondExtEn           : 1,
-      RVSCLIC               : cfg.Clic,
-      RVF                   : 1,
-      RVD                   : 1,
-      FpPresent             : 1,
-      NSX                   : 0,
-      FLen                  : 64,
-      RVFVec                : 0,
-      XF16Vec               : 0,
-      XF16ALTVec            : 0,
-      XF8Vec                : 0,
-      NrRgprPorts           : 0,
-      NrWbPorts             : 0,
-      EnableAccelerator     : 0,
-      RVS                   : 1,
-      RVU                   : 1,
-      HaltAddress           : 'h800, // Relative to AmDbg
-      ExceptionAddress      : 'h810, // Relative to AmDbg
-      RASDepth              : cfg.Cva6RASDepth,
-      BTBEntries            : cfg.Cva6BTBEntries,
-      BHTEntries            : cfg.Cva6BHTEntries,
-      DmBaseAddress         : AmDbg,
-      TvalEn                : 1,
-      NrPMPEntries          : cfg.Cva6NrPMPEntries,
-      PMPCfgRstVal          : {16{64'h0}},
-      PMPAddrRstVal         : {16{64'h0}},
-      PMPEntryReadOnly      : 16'd0,
-      NOCType               : config_pkg::NOC_TYPE_AXI4_ATOP,
-      CLICNumInterruptSrc   : NumCoreIrqs + NumIntIntrs + cfg.NumExtClicIntrs,
-      NrNonIdempotentRules  : 2,   // Periphs, ExtNonCIE
-      NonIdempotentAddrBase : {64'h0000_0000, NoCieBase},
-      NonIdempotentLength   : {64'h1000_0000, 64'h6000_0000 - cfg.Cva6ExtCieLength},
-      NrExecuteRegionRules  : 6,   // Debug, Bootrom, SPM, SPM Uncached, LLCOut, ExtCIE
-      ExecuteRegionAddrBase : {AmDbg,     AmBrom,    AmSpm,   AmSpmUnc, cfg.LlcOutRegionStart, CieBase},
-      ExecuteRegionLength   : {64'h40000, 64'h40000, SizeSpm, SizeSpm,  SizeLlcOut,            cfg.Cva6ExtCieLength},
-      NrCachedRegionRules   : 3,   // CachedSPM, LLCOut, ExtCIE
-      CachedRegionAddrBase  : {AmSpm,   cfg.LlcOutRegionStart,  CieBase},
-      CachedRegionLength    : {SizeSpm, SizeLlcOut,             cfg.Cva6ExtCieLength},
-      MaxOutstandingStores  : 7,
-      DebugEn               : 1,
-      NonIdemPotenceEn      : 0,
-      AxiBurstWriteEn       : 0
-    };
+
+    // Generate CVA6 config based on the selected one (see Bender target)
+    config_pkg::cva6_cfg_t local_config = build_config_pkg::build_config(cva6_config_pkg::cva6_cfg);
+
+    // Override the CVA6 config with Cheshire-dependent paramenters
+    local_config.AxiAddrWidth          = cfg.AddrWidth;
+    local_config.AxiDataWidth          = cfg.AxiDataWidth;
+    local_config.AxiIdWidth            = Cva6IdWidth;
+    local_config.AxiUserWidth          = cfg.AxiUserWidth;
+`ifdef TARGET_PULP
+    local_config.NrCommitPorts         = 2;
+    local_config.NrLoadBufEntries      = 2;
+    local_config.FpuEn                 = 1;
+    local_config.ZiCondExtEn           = 1;
+    local_config.XF8ALT                = 0;
+    local_config.RVSCLIC               = cfg.Clic;
+    local_cfg.CLICNumInterruptSrc   = NumCoreIrqs + NumIntIntrs + cfg.NumExtClicIntrs;
+    local_config.XF16                  = 0;
+    local_config.XF16ALT               = 0;
+    local_config.XF8                   = 0;
+    local_config.RVA                   = 1;
+    local_config.RVB                   = 0;
+    local_config.RVV                   = 0;
+    local_config.RVC                   = 1;
+    local_config.RVH                   = 1;
+    local_config.RVZCB                 = 1;
+    local_config.XFVec                 = 0;
+    local_config.CvxifEn               = 0;
+    local_config.RVF                   = 1;
+    local_config.RVD                   = 1;
+    local_config.FpPresent             = 1;
+    local_config.NSX                   = 0;
+    local_config.FLen                  = 64;
+    local_config.RVFVec                = 0;
+    local_config.XF16Vec               = 0;
+    local_config.XF16ALTVec            = 0;
+    local_config.XF8Vec                = 0;
+    local_config.NrRgprPorts           = 0;
+    local_config.NrWbPorts             = 0;
+    local_config.EnableAccelerator     = 0;
+    local_config.RVS                   = 1;
+    local_config.RVU                   = 1;
+    local_config.TvalEn                = 1;
+    local_config.NOCType               = config_pkg::NOC_TYPE_AXI4_ATOP;
+    local_config.MaxOutstandingStores  = 7;
+    local_config.DebugEn               = 1;
+    local_config.NonIdemPotenceEn      = 0;
+    local_config.AxiBurstWriteEn       = 0;
+`endif
+    local_config.HaltAddress           = 'h800; // Relative to AmDbg
+    local_config.ExceptionAddress      = 'h810; // Relative to AmDbg
+    local_config.RASDepth              = cfg.Cva6RASDepth;
+    local_config.BTBEntries            = cfg.Cva6BTBEntries;
+    local_config.BHTEntries            = cfg.Cva6BHTEntries;
+    local_config.DmBaseAddress         = AmDbg;
+    local_config.NrPMPEntries          = cfg.Cva6NrPMPEntries;
+    local_config.PMPCfgRstVal          = {16{64'h0}};
+    local_config.PMPAddrRstVal         = {16{64'h0}};
+    local_config.PMPEntryReadOnly      = 16'd0;
+    local_config.NrNonIdempotentRules  = 2;   // Periphs, ExtNonCIe
+    local_config.NonIdempotentAddrBase = {64'h0000_0000, NoCieBase};
+    local_config.NonIdempotentLength   = {64'h1000_0000, 64'h6000_0000 - cfg.Cva6ExtCieLength};
+    local_config.NrExecuteRegionRules  = 6;   // Debug, Bootrom, SPM, SPM Uncached, LLCOut, ExtCIe
+    local_config.ExecuteRegionAddrBase = {AmDbg,     AmBrom,    AmSpm,   AmSpmUnc, cfg.LlcOutRegionStart, CieBase};
+    local_config.ExecuteRegionLength   = {64'h40000, 64'h40000, SizeSpm, SizeSpm,  SizeLlcOut,            cfg.Cva6ExtCieLength};
+    local_config.NrCachedRegionRules   = 3;   // CachedSPM, LLCOut, ExtCIe
+    local_config.CachedRegionAddrBase  = {AmSpm,   cfg.LlcOutRegionStart,  CieBase};
+    local_config.CachedRegionLength    = {SizeSpm, SizeLlcOut,             cfg.Cva6ExtCieLength};
+
+    return local_config;
+
   endfunction
 
   ////////////////
