@@ -55,7 +55,7 @@ CHS_SW_DEPS_INCS += -I$(CHS_SW_DIR)/deps/coremark
 CHS_SW_DEPS_INCS += -I$(CHS_SW_DIR)/deps/coremark/cheshire
 CHS_SW_DEPS_SRCS += $(wildcard $(CHS_SW_DIR)/deps/coremark/*.c)
 CHS_SW_DEPS_SRCS += $(wildcard $(CHS_SW_DIR)/deps/coremark/cheshire/*.c)
-COREMARK_SW_FLAGS += -DFLAGS_STR=\"$(COREMARK_FLAGS_STR)\" -DITERATIONS=$(COREMARK_ITERATIONS)
+COREMARK_SW_FLAGS += -DFLAGS_STR="\"$(COREMARK_FLAGS_STR)\"" -DITERATIONS=$(COREMARK_ITERATIONS)
 #############
 # Libraries #
 #############
