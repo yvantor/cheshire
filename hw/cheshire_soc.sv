@@ -1197,8 +1197,65 @@ module cheshire_soc import cheshire_pkg::*; #(
   //  UART  //
   ////////////
 
+
+  // UartPrelMode gets overwritten in start.cheshire.tcl
+  // if the UART prelode mode gets selected
+  parameter bit UartPrelMode = 1'b0;
   if (Cfg.Uart) begin : gen_uart
 
+  `ifdef TARGET_SIM
+    if (UartPrelMode) begin : gen_real_uart
+      reg_uart_wrap #(
+        .AddrWidth  ( Cfg.AddrWidth ),
+        .reg_req_t  ( reg_req_t ),
+        .reg_rsp_t  ( reg_rsp_t )
+      ) i_uart (
+        .clk_i,
+        .rst_ni,
+        .reg_req_i  ( reg_out_req[RegOut.uart] ),
+        .reg_rsp_o  ( reg_out_rsp[RegOut.uart] ),
+        .intr_o     ( intr.intn.uart ),
+        .out2_no    ( ),
+        .out1_no    ( ),
+        .rts_no     ( uart_rts_no ),
+        .dtr_no     ( uart_dtr_no ),
+        .cts_ni     ( uart_cts_ni ),
+        .dsr_ni     ( uart_dsr_ni ),
+        .dcd_ni     ( uart_dcd_ni ),
+        .rin_ni     ( uart_rin_ni ),
+        .sin_i      ( uart_rx_i   ),
+        .sout_o     ( uart_tx_o   )
+      );
+    end else begin : gen_emulated_uart
+      tb_fs_handler_debug #(
+        .ADDR_WIDTH   ( 12 ),
+        .DATA_WIDTH   ( 32 ),
+        .NB_CORES     ( 1  ),
+        .OPEN_FILES   ( 0 ),
+        .DEBUG_TYPE   ( "PE"  ),
+        .SILENT_MODE  ( "OFF" ),
+        .FULL_LINE    ( "ON"  ),
+        .COLORED_MODE ( "OFF" )
+      ) i_fs_handldler (
+        .clk_i,
+        .rst_ni,
+        .req_i ( (reg_out_req[RegOut.uart].addr[7:0] == '0) &&
+                 reg_out_req[RegOut.uart].write &&
+                 reg_out_req[RegOut.uart].valid ),
+        .add_i ( '0 ),
+        .dat_i ( reg_out_req[RegOut.uart].wdata )
+      );
+
+      assign reg_out_rsp[RegOut.uart].rdata =
+             reg_out_req[RegOut.uart].addr[7:0] == 'h14 ? (32'h0 | 1'b1 << 5) : '0;
+      assign reg_out_rsp[RegOut.uart].ready = '1;
+      assign reg_out_rsp[RegOut.uart].error = '0;
+      assign uart_rts_no  = 0;
+      assign uart_dtr_no  = 0;
+      assign uart_tx_o    = 0;
+      assign intr.intn.uart  = 0;
+    end
+  `else
     reg_uart_wrap #(
       .AddrWidth  ( Cfg.AddrWidth ),
       .reg_req_t  ( reg_req_t ),
@@ -1220,6 +1277,7 @@ module cheshire_soc import cheshire_pkg::*; #(
       .sin_i      ( uart_rx_i   ),
       .sout_o     ( uart_tx_o   )
     );
+  `endif
 
   end else begin : gen_no_uart
 

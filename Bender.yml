@@ -52,6 +52,7 @@ sources:
       - target/sim/src/vip_cheshire_soc.sv
       - target/sim/src/tb_cheshire_pkg.sv
       - target/sim/src/fixture_cheshire_soc.sv
+      - target/sim/src/tb_fs_handler.sv
       - target/sim/src/tb_cheshire_soc.sv
 
   - target: all(fpga, xilinx)
