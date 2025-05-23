@@ -1226,34 +1226,16 @@ module cheshire_soc import cheshire_pkg::*; #(
         .sin_i      ( uart_rx_i   ),
         .sout_o     ( uart_tx_o   )
       );
-    end else begin : gen_emulated_uart
-      tb_fs_handler_debug #(
-        .ADDR_WIDTH   ( 12 ),
-        .DATA_WIDTH   ( 32 ),
-        .NB_CORES     ( 1  ),
-        .OPEN_FILES   ( 0 ),
-        .DEBUG_TYPE   ( "PE"  ),
-        .SILENT_MODE  ( "OFF" ),
-        .FULL_LINE    ( "ON"  ),
-        .COLORED_MODE ( "OFF" )
-      ) i_fs_handldler (
+    end else begin : gen_sim_uart
+      chs_sim_uart #(
+        .reg_req_t ( reg_req_t ),
+        .reg_rsp_t ( reg_rsp_t )
+      ) i_sim_uart (
         .clk_i,
         .rst_ni,
-        .req_i ( (reg_out_req[RegOut.uart].addr[7:0] == '0) &&
-                 reg_out_req[RegOut.uart].write &&
-                 reg_out_req[RegOut.uart].valid ),
-        .add_i ( '0 ),
-        .dat_i ( reg_out_req[RegOut.uart].wdata )
+        .reg_req_i ( reg_out_req[RegOut.uart] ),
+        .reg_rsp_o ( reg_out_rsp[RegOut.uart] )
       );
-
-      assign reg_out_rsp[RegOut.uart].rdata =
-             reg_out_req[RegOut.uart].addr[7:0] == 'h14 ? (32'h0 | 2'b11 << 5) : '0;
-      assign reg_out_rsp[RegOut.uart].ready = '1;
-      assign reg_out_rsp[RegOut.uart].error = '0;
-      assign uart_rts_no  = 0;
-      assign uart_dtr_no  = 0;
-      assign uart_tx_o    = 0;
-      assign intr.intn.uart  = 0;
     end
   `else
     reg_uart_wrap #(
