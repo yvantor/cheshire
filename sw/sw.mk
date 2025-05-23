@@ -50,7 +50,7 @@ CHS_SW_DEPS_SRCS += $(wildcard $(OTPROOT)/sw/device/lib/dif/autogen/*.c)
 
 # Coremark-dependant parameters
 COREMARK_FLAGS_STR ?= $(CHS_SW_CCFLAGS) $(CHS_SW_LDFLAGS)
-COREMARK_ITERATIONS ?= 10
+COREMARK_ITERATIONS ?= 4
 CHS_SW_DEPS_INCS += -I$(CHS_SW_DIR)/deps/coremark
 CHS_SW_DEPS_INCS += -I$(CHS_SW_DIR)/deps/coremark/cheshire
 CHS_SW_DEPS_SRCS += $(wildcard $(CHS_SW_DIR)/deps/coremark/*.c)
