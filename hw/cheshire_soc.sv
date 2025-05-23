@@ -1247,7 +1247,7 @@ module cheshire_soc import cheshire_pkg::*; #(
       );
 
       assign reg_out_rsp[RegOut.uart].rdata =
-             reg_out_req[RegOut.uart].addr[7:0] == 'h14 ? (32'h0 | 1'b1 << 5) : '0;
+             reg_out_req[RegOut.uart].addr[7:0] == 'h14 ? (32'h0 | 2'b11 << 5) : '0;
       assign reg_out_rsp[RegOut.uart].ready = '1;
       assign reg_out_rsp[RegOut.uart].error = '0;
       assign uart_rts_no  = 0;
