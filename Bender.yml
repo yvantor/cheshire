@@ -22,7 +22,7 @@ dependencies:
   clint:                    { git: "https://github.com/pulp-platform/clint.git",                  version: 0.2.0  }
   common_cells:             { git: "https://github.com/pulp-platform/common_cells.git",           version: 1.33.0 }
   common_verification:      { git: "https://github.com/pulp-platform/common_verification.git",    version: 0.2.0  }
-  cva6:                     { git: "https://github.com/pulp-platform/cva6.git",                   rev: pulp-v1.0.0 }
+  cva6:                     { git: "https://github.com/openhwgroup/cva6.git",                     rev: 94dfdb0 } # branch: master
   iDMA:                     { git: "https://github.com/pulp-platform/iDMA.git",                   version: 0.6.3  }
   irq_router:               { git: "https://github.com/pulp-platform/irq_router.git",             version: 0.0.1-beta.1 }
   opentitan_peripherals:    { git: "https://github.com/pulp-platform/opentitan_peripherals.git",  version: 0.4.0  }
@@ -49,6 +49,7 @@ sources:
     files:
       - target/sim/models/s25fs512s.v
       - target/sim/models/24FC1025.v
+      - target/sim/src/chs_sim_uart.sv
       - target/sim/src/vip_cheshire_soc.sv
       - target/sim/src/tb_cheshire_pkg.sv
       - target/sim/src/fixture_cheshire_soc.sv

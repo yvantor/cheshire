@@ -9,6 +9,11 @@
 
 set TESTBENCH tb_cheshire_soc
 
+# Example parameters for running tests
+set BINARY ../../../sw/tests/helloworld.spm.elf
+set BOOTMODE 0
+set PRELMODE 1
+
 # Set full path to c++ compiler.
 if { ![info exists CXX_PATH] } {
     if { ![info exists CXX] } {
@@ -24,7 +29,7 @@ if { ![info exists CXX_PATH] } {
 # Set voptargs only if not already set to make overridable.
 # Default on fast simulation flags.
 if { ![info exists VOPTARGS] } {
-    set VOPTARGS "-O5 +acc=p+tb_cheshire_soc. +noacc=p+cheshire_soc. +acc=r+stream_xbar"
+    set VOPTARGS "-O5 +acc"
 }
 
 set flags "-permissive -suppress 3009 -suppress 8386 -error 7 -cpppath ${CXX_PATH} "
@@ -32,7 +37,10 @@ if { [info exists SELCFG] } { append flags "-GSelectedCfg=${SELCFG} " }
 
 set pargs ""
 if { [info exists BOOTMODE] } { append pargs "+BOOTMODE=${BOOTMODE} " }
-if { [info exists PRELMODE] } { append pargs "+PRELMODE=${PRELMODE} " }
+if { [info exists PRELMODE] } {
+    append pargs "+PRELMODE=${PRELMODE} "
+    if { $PRELMODE == 2 } { append flags "-G${TESTBENCH}.fix.dut.UartPrelMode=1 " }
+}
 if { [info exists BINARY] } { append pargs "+BINARY=${BINARY} " }
 if { [info exists IMAGE] } { append pargs "+IMAGE=${IMAGE} " }
 
