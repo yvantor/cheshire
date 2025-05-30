@@ -32,6 +32,10 @@ dependencies:
   unbent:                   { git: "https://github.com/pulp-platform/unbent.git",                 version: 0.1.6  }
   dram_rtl_sim:             { git: "https://github.com/pulp-platform/dram_rtl_sim.git",           version: 0.1.1  }
 
+workspace:
+  package_links:
+    cva6: cva6
+
 export_include_dirs:
   - hw/include
 
@@ -47,6 +51,7 @@ sources:
 
   - target: any(simulation, test)
     files:
+      - cva6/corev_apu/tb/common/mock_uart.sv
       - target/sim/models/s25fs512s.v
       - target/sim/models/24FC1025.v
       - target/sim/src/chs_sim_uart.sv
