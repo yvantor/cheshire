@@ -72,7 +72,6 @@ void uart_open() {
 };
 
 void _putchar(char character) {
-    uart_open();
     uart_write(&__base_uart, character);
     uart_write_flush(&__base_uart);
 };
