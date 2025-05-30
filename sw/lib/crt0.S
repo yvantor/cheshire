@@ -112,8 +112,6 @@ _fp_init:
     // Set FS state to "Clean"
     csrrc x0, mstatus, t1
 
-_soc_init:
-    jal x1, soc_init
     // Full fence, then jump to main
     fence
     call main

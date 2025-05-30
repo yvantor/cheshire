@@ -65,12 +65,6 @@ void uart_read_str(void *uart_base, void *dst, uint64_t len) {
     for (uint64_t i = 0; i < len; ++i) ((uint8_t *)dst)[i] = uart_read(uart_base);
 }
 
-void uart_open() {
-    uint32_t rtc_freq = *reg32(&__base_regs, CHESHIRE_RTC_FREQ_REG_OFFSET);
-    uint64_t reset_freq = clint_get_core_freq(rtc_freq, 2500);
-    uart_init(&__base_uart, reset_freq, 115200);
-};
-
 void _putchar(char character) {
     uart_write(&__base_uart, character);
     uart_write_flush(&__base_uart);
