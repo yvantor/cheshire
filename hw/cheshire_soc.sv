@@ -558,7 +558,7 @@ module cheshire_soc import cheshire_pkg::*; #(
 
   `CHESHIRE_TYPEDEF_AXI_CT(axi_cva6, addr_t, cva6_id_t, axi_data_t, axi_strb_t, axi_user_t)
 
-  localparam config_pkg::cva6_cfg_t Cva6Cfg = gen_cva6_cfg(Cfg);
+  localparam config_pkg::cva6_user_cfg_t Cva6Cfg = gen_cva6_cfg(Cfg);
 
   // Boot from boot ROM only if available, otherwise from platform ROM
   localparam logic [63:0] BootAddr = 64'(Cfg.Bootrom ? AmBrom : Cfg.PlatformRom);
@@ -600,7 +600,7 @@ module cheshire_soc import cheshire_pkg::*; #(
     riscv::priv_lvl_t  clic_irq_priv;
 
     cva6 #(
-      .CVA6Cfg        ( Cva6Cfg ),
+      .CVA6Cfg        ( build_config_pkg::build_config(Cva6Cfg) ),
       .axi_ar_chan_t  ( axi_cva6_ar_chan_t ),
       .axi_aw_chan_t  ( axi_cva6_aw_chan_t ),
       .axi_w_chan_t   ( axi_cva6_w_chan_t  ),
@@ -617,6 +617,7 @@ module cheshire_soc import cheshire_pkg::*; #(
       .ipi_i            ( msip[i] ),
       .time_irq_i       ( mtip[i] ),
       .debug_req_i      ( dbg_int_req[i] ),
+`ifdef TARGET_PULP
       .clic_irq_valid_i ( clic_irq_valid ),
       .clic_irq_id_i    ( clic_irq_id    ),
       .clic_irq_level_i ( clic_irq_level ),
@@ -625,6 +626,7 @@ module cheshire_soc import cheshire_pkg::*; #(
       .clic_irq_ready_o ( clic_irq_ready ),
       .clic_kill_req_i  ( clic_irq_kill_req ),
       .clic_kill_ack_o  ( clic_irq_kill_ack ),
+`endif
       .rvfi_probes_o    ( ),
       .cvxif_req_o      ( ),
       .cvxif_resp_i     ( '0 ),
@@ -1195,8 +1197,47 @@ module cheshire_soc import cheshire_pkg::*; #(
   //  UART  //
   ////////////
 
+
+  // UartPrelMode gets overwritten in start.cheshire.tcl
+  // if the UART prelode mode gets selected
+  parameter bit UartPrelMode = 1'b0;
   if (Cfg.Uart) begin : gen_uart
 
+  `ifdef TARGET_SIM
+    if (UartPrelMode) begin : gen_real_uart
+      reg_uart_wrap #(
+        .AddrWidth  ( Cfg.AddrWidth ),
+        .reg_req_t  ( reg_req_t ),
+        .reg_rsp_t  ( reg_rsp_t )
+      ) i_uart (
+        .clk_i,
+        .rst_ni,
+        .reg_req_i  ( reg_out_req[RegOut.uart] ),
+        .reg_rsp_o  ( reg_out_rsp[RegOut.uart] ),
+        .intr_o     ( intr.intn.uart ),
+        .out2_no    ( ),
+        .out1_no    ( ),
+        .rts_no     ( uart_rts_no ),
+        .dtr_no     ( uart_dtr_no ),
+        .cts_ni     ( uart_cts_ni ),
+        .dsr_ni     ( uart_dsr_ni ),
+        .dcd_ni     ( uart_dcd_ni ),
+        .rin_ni     ( uart_rin_ni ),
+        .sin_i      ( uart_rx_i   ),
+        .sout_o     ( uart_tx_o   )
+      );
+    end else begin : gen_sim_uart
+      chs_sim_uart #(
+        .reg_req_t ( reg_req_t ),
+        .reg_rsp_t ( reg_rsp_t )
+      ) i_sim_uart (
+        .clk_i,
+        .rst_ni,
+        .reg_req_i ( reg_out_req[RegOut.uart] ),
+        .reg_rsp_o ( reg_out_rsp[RegOut.uart] )
+      );
+    end
+  `else
     reg_uart_wrap #(
       .AddrWidth  ( Cfg.AddrWidth ),
       .reg_req_t  ( reg_req_t ),
@@ -1218,6 +1259,7 @@ module cheshire_soc import cheshire_pkg::*; #(
       .sin_i      ( uart_rx_i   ),
       .sout_o     ( uart_tx_o   )
     );
+  `endif
 
   end else begin : gen_no_uart
 

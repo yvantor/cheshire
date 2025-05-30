@@ -41,6 +41,8 @@ uint8_t uart_read(void *uart_base);
 
 void uart_read_str(void *uart_base, void *dst, uint64_t len);
 
+void uart_open();
+
 // Default UART provides console
 void _putchar(char byte);
 

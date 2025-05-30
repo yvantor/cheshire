@@ -5,6 +5,8 @@
 // Nils Wistoff <nwistoff@iis.ee.ethz.ch>
 // Paul Scheffler <paulsc@iis.ee.ethz.ch>
 
+#include "regs/cheshire.h"
+#include "dif/clint.h"
 #include "dif/uart.h"
 #include "util.h"
 #include "params.h"
@@ -63,10 +65,10 @@ void uart_read_str(void *uart_base, void *dst, uint64_t len) {
     for (uint64_t i = 0; i < len; ++i) ((uint8_t *)dst)[i] = uart_read(uart_base);
 }
 
-// Default UART provides console
-void _putchar(char byte) {
-    uart_write(&__base_uart, byte);
-}
+void _putchar(char character) {
+    uart_write(&__base_uart, character);
+    uart_write_flush(&__base_uart);
+};
 
 char _getchar() {
     return uart_read(&__base_uart);

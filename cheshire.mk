@@ -16,7 +16,14 @@ VLOG_ARGS   ?= -suppress 2583 -suppress 13314 -timescale 1ns/1ps
 VLOGAN_ARGS ?= -kdb -nc -assert svaext +v2k -timescale=1ns/1ps
 
 # Common Bender flags for Cheshire RTL
-CHS_BENDER_RTL_FLAGS ?= -t rtl -t cva6 -t cv64a6_imafdcsclic_sv39
+CHS_BENDER_RTL_FLAGS ?= -t rtl -t cva6
+
+ifeq ($(CVA6_TARGET), "pulp")
+CHS_BENDER_RTL_FLAGS += -t pulp
+CHS_BENDER_RTL_FLAGS += -t cv64a6_imafdcsclic_sv39
+else
+CHS_BENDER_RTL_FLAGS += -t cv64a6_imafdch_sv39_wb
+endif
 
 # Define used paths (prefixed to avoid name conflicts)
 CHS_ROOT      ?= $(shell $(BENDER) path cheshire)
@@ -43,7 +50,7 @@ BENDER_ROOT ?= $(CHS_ROOT)/.bender
 # Ensure both Bender dependencies and (essential) submodules are checked out
 $(BENDER_ROOT)/.chs_deps:
 	$(BENDER) checkout
-	cd $(CHS_ROOT) && git submodule update --init --recursive sw/deps/printf
+	cd $(CHS_ROOT) && git submodule update --init --recursive sw/deps/printf sw/deps/coremark
 	@touch $@
 
 # Make sure dependencies are more up-to-date than any targets run
