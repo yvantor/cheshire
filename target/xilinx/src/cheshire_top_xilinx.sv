@@ -92,7 +92,9 @@ module cheshire_top_xilinx import cheshire_pkg::*; (
   input  logic  uart_rx_i,
 
   inout  wire [UsbNumPorts-1:0] usb_dm_io,
-  inout  wire [UsbNumPorts-1:0] usb_dp_io
+  inout  wire [UsbNumPorts-1:0] usb_dp_io,
+  input  logic can_rx_i,
+  output logic can_tx_o
 );
 
   ///////////////////////
@@ -569,7 +571,9 @@ module cheshire_top_xilinx import cheshire_pkg::*; (
     .usb_dm_oe_o,
     .usb_dp_i,
     .usb_dp_o,
-    .usb_dp_oe_o
+    .usb_dp_oe_o,
+    .can_rx_i,
+    .can_tx_o
   );
 
 endmodule
