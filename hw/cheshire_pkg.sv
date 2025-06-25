@@ -139,6 +139,7 @@ package cheshire_pkg;
     bit     IrqRouter;
     bit     BusErr;
     bit     CanBus;
+    bit     CanBusFpga;
     // Parameters for Debug Module
     jtag_idcode_t DbgIdCode;
     dw_bt   DbgMaxReqs;
@@ -617,6 +618,7 @@ package cheshire_pkg;
     IrqRouter         : 0,
     BusErr            : 1,
     CanBus            : 1,
+    CanBusFpga        : 0,
     // Debug
     DbgIdCode         : CheshireIdCode,
     DbgMaxReqs        : 4,

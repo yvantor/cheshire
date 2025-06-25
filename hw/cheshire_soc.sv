@@ -1747,7 +1747,7 @@ module cheshire_soc import cheshire_pkg::*; #(
     can_top_apb #(
       .rx_buffer_size   ( 32 ),
       .txt_buffer_count ( 2 ),
-      .target_technology( 0 ) // 0 for ASIC or 1 for FPGA
+      .target_technology( Cfg.CanBusFpga ) // 0 for ASIC or 1 for FPGA
     ) i_apb_to_can (
       .aclk             ( clk_i  ),
       .arstn            ( rst_ni ),
