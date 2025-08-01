@@ -91,10 +91,11 @@ module cheshire_top_xilinx import cheshire_pkg::*; (
   output logic  uart_tx_o,
   input  logic  uart_rx_i,
 
-  inout  wire [UsbNumPorts-1:0] usb_dm_io,
-  inout  wire [UsbNumPorts-1:0] usb_dp_io,
   input  logic can_rx_i,
-  output logic can_tx_o
+  output logic can_tx_o,
+
+  inout  wire [UsbNumPorts-1:0] usb_dm_io,
+  inout  wire [UsbNumPorts-1:0] usb_dp_io
 );
 
   ///////////////////////
@@ -565,6 +566,8 @@ module cheshire_top_xilinx import cheshire_pkg::*; (
 `endif
     .uart_tx_o,
     .uart_rx_i,
+    .can_rx_i,
+    .can_tx_o,
     .usb_clk_i          ( usb_clk ),
     .usb_rst_ni         ( rst_n ), // Technically should sync to `usb_clk`, but pulse is long enough
     .usb_dm_i,
@@ -572,9 +575,7 @@ module cheshire_top_xilinx import cheshire_pkg::*; (
     .usb_dm_oe_o,
     .usb_dp_i,
     .usb_dp_o,
-    .usb_dp_oe_o,
-    .can_rx_i,
-    .can_tx_o
+    .usb_dp_oe_o
   );
 
 endmodule

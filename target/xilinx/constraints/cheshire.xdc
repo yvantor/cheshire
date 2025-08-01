@@ -60,6 +60,19 @@ set_false_path -hold -from [get_ports uart_rx_i]
 set_max_delay [expr { $UART_IO_SPEED * 0.35 }] -to [get_ports uart_tx_o]
 set_false_path -hold -to [get_ports uart_tx_o]
 
+#######
+# CAN #
+#######
+
+# CAN speed is at most 10 Mb/s
+set CAN_IO_SPEED 100.0
+
+set_max_delay [expr { $CAN_IO_SPEED * 0.35 }] -from [get_ports can_rx_i]
+set_false_path -hold -from [get_ports can_rx_i]
+
+set_max_delay [expr { $CAN_IO_SPEED * 0.35 }] -to [get_ports can_tx_o]
+set_false_path -hold -to [get_ports can_tx_o]
+
 ########
 # CDCs #
 ########
