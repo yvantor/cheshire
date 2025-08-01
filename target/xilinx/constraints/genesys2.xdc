@@ -210,7 +210,7 @@ set_property -dict { PACKAGE_PIN T20   IOSTANDARD LVCMOS33 } [get_ports { usb_dm
 set_property -dict { PACKAGE_PIN T21   IOSTANDARD LVCMOS33 } [get_ports { usb_dp_io[0] }]; #IO_L4N_T0_D05_14 Sch=ja_n[4]
 
 # CAN
-set_property -dict { PACKAGE_PIN E26   IOSTANDARD LVCMOS12 } [get_ports { can_rx_i[12] }]; #IO_L5N_T0_16 Sch=fmc_la_n[12]
-set_property -dict { PACKAGE_PIN F26   IOSTANDARD LVCMOS12 } [get_ports { can_tx_o[12] }]; #IO_L5P_T0_16 Sch=fmc_la_p[12]
+set_property -dict { PACKAGE_PIN E26   IOSTANDARD LVCMOS12 } [get_ports { can_rx_i }]; #IO_L5N_T0_16 Sch=fmc_la_n[12]
+set_property -dict { PACKAGE_PIN F26   IOSTANDARD LVCMOS12 } [get_ports { can_tx_o }]; #IO_L5P_T0_16 Sch=fmc_la_p[12]
 
 # tclint-enable line-length, spacing
