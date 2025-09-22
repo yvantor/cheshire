@@ -476,7 +476,7 @@ package cheshire_pkg;
                   '{Cva6IdBypAmo, 3}, '{Cva6IdICache,  4}, '{Cva6IdDCache,   5}};
       // With 4b of ID or more, no remapping is necessary; return redundant 0 -> 0 ID remaps.
       // This leaves ID mapping unaltered only if `MstIdBaseOffset` in `axi_id_serialize` is 0.
-      default: return '{default: DefaultMapEntry};
+      default: return '{Cva6IdsUsed {DefaultMapEntry}};
     endcase
   endfunction
 
