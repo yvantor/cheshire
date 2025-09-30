@@ -324,6 +324,7 @@ module vip_cheshire_soc import cheshire_pkg::*; #(
   endtask
 
   // Load a binary
+  // Note: all sections must be 64b-aligned
   task automatic jtag_elf_preload(input string binary, output doub_bt entry);
     longint sec_addr, sec_len;
     $display("[JTAG] Preloading ELF binary: %s", binary);
